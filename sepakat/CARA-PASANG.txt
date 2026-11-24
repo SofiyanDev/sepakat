@@ -1,0 +1,66 @@
+SEPAKAT - CARA PASANG DI XAMPP (sistem tersambung database)
+============================================================
+
+A. SIAPKAN
+1. Install XAMPP (https://www.apachefriends.org), versi PHP 8.
+2. Buka XAMPP Control Panel -> klik Start pada Apache dan MySQL (dua-duanya hijau).
+
+B. IMPORT DATABASE
+3. Buka browser: http://localhost/phpmyadmin
+4. Kalau database "sepakat" SUDAH pernah dibuat: tab SQL -> ketik  DROP DATABASE sepakat;  -> Go.
+   Tab "Import" -> Choose File -> pilih  database/sepakat.sql  -> klik Import/Go.
+   (Pesan kuning "#1008 Can't drop database" = aman, abaikan.)
+5. Di kiri muncul database "sepakat" berisi 9 tabel + rekap_voting.
+6. (Opsional, penutupan voting otomatis harian) tab SQL, jalankan:
+      SET GLOBAL event_scheduler = ON;
+   Tanpa ini pun voting tetap tertutup otomatis setiap halaman dibuka.
+
+C. PASANG APLIKASI
+7. Salin folder "sepakat" ini ke  C:\xampp\htdocs\
+   sehingga jadi  C:\xampp\htdocs\sepakat\index.html
+8. Buka browser: http://localhost/sepakat
+   (JANGAN klik dua kali index.html, harus lewat http://localhost)
+
+D. LOGIN (password semua akun: sepakat123)
+   Dosen      : 0412038801        (Siska, M.Kom.)
+   Fakultas   : admin
+   Mahasiswa  : 24 mahasiswa SI-3A, username = NPM
+                contoh 2510631250013 (Salwa Khalipa)
+                       2510631250004 (Anisa Putri Amelia)
+
+E. ALUR UJI COBA
+   1) Login Dosen -> Ajukan Perubahan -> pilih tanggal > 7 hari lagi -> pilih slot hijau -> Kirim.
+   2) Login Fakultas -> Keputusan Perubahan -> Buka voting.
+   3) Login Mahasiswa kelas itu -> lihat notifikasi -> Voting (Setuju / Tidak setuju + alasan).
+   4) Fakultas -> "Tutup voting sekarang (simulasi H-7)" -> hasil >50% keluar + notifikasi.
+   Cek datanya di phpMyAdmin: tabel pengajuan_perubahan, voting, notifikasi.
+
+F. BUKA DI HP (DEPLOY JARINGAN LOKAL, TANPA TUNNEL)
+   1. Laptop (yang menjalankan XAMPP) dan HP sambung ke WiFi/hotspot yang SAMA.
+   2. Cari IP laptop: CMD -> ketik ipconfig -> lihat "IPv4 Address" (misal 192.168.1.5).
+   3. Di HP buka browser: http://192.168.1.5/sepakat  (ganti dengan IP laptop).
+   4. Login seperti biasa. Semua data masuk ke MySQL di laptop (cek di phpMyAdmin).
+   5. Kalau HP tidak bisa membuka: Windows Defender Firewall -> Allow an app ->
+      centang "Apache HTTP Server" (Private dan Public) -> OK.
+   Catatan: lewat http, pop-up notifikasi di layar HP diblokir browser.
+   Notifikasi tetap muncul di dalam sistem (ikon lonceng + Beranda, dicek tiap 20 detik)
+   dan tersimpan di tabel notifikasi.
+
+G. KALAU ERROR
+   - "Gagal konek ke database"  -> MySQL belum Start / database belum di-import.
+     Kalau MySQL kamu pakai password, ubah $DB_PASS di api/koneksi.php.
+   - "Server tidak bisa dihubungi" -> dibuka dari file, bukan dari http://localhost/sepakat.
+   - HP tidak bisa membuka -> beda WiFi, IP laptop berubah (cek ulang ipconfig), atau firewall (lihat F.5).
+   - Halaman kosong / data tidak muncul -> tekan F12 > Console, kirim screenshot error-nya.
+
+STRUKTUR FOLDER
+   index.html, css/, js/script.js   : tampilan (HTML/CSS/JS)
+   api/koneksi.php                  : koneksi ke MySQL
+   api/login.php, logout.php        : login per peran
+   api/data.php                     : ambil data sesuai peran + tutup voting otomatis
+   api/pengajuan.php                : dosen mengajukan (cek H-7, maks 3x, bentrok)
+   api/keputusan.php                : fakultas buka/tolak/tutup voting
+   api/voting.php                   : mahasiswa voting / keberatan
+   api/notifikasi.php               : notifikasi baru (pop-up) + tandai dibaca
+   database/sepakat.sql             : database
+   sw.js, manifest.json             : notifikasi HP & pasang di layar utama

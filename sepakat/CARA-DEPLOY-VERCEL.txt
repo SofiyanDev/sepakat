@@ -1,0 +1,60 @@
+SEPAKAT - CARA DEPLOY KE VERCEL (online, bisa dibuka dari HP mana saja)
+=======================================================================
+Susunan: tampilan + api PHP di Vercel, database MySQL di TiDB Cloud (gratis).
+Versi XAMPP tetap jalan seperti biasa (lihat CARA-PASANG.txt), tidak perlu diubah.
+
+A. DATABASE ONLINE (TiDB Cloud Starter, gratis)
+1. Buka https://tidbcloud.com -> Sign up (bisa pakai akun Google/GitHub).
+2. Create Cluster / Create Instance -> pilih "Starter" (Free).
+   Region: pilih yang paling dekat, misal Singapore (ap-southeast-1). -> Create.
+3. Setelah jadi, klik tombol "Connect":
+   - Connect With: General
+   - klik "Generate Password" -> SALIN dan SIMPAN password-nya (cuma muncul sekali).
+   - Catat: HOST (gateway01....tidbcloud.com), PORT (4000), USERNAME (xxxxx.root).
+4. Import database: menu "SQL Editor" -> buka file  database/sepakat-cloud.sql
+   pakai Notepad -> Ctrl+A, Ctrl+C -> tempel di SQL Editor -> "Run" (jalankan semua).
+   Cek: muncul database "sepakat" berisi 10 tabel (+ sesi) dan view rekap_voting.
+   (Cara lain lewat CMD, pakai client MySQL bawaan XAMPP:
+    C:\xampp\mysql\bin\mysql.exe -h HOST -P 4000 -u USERNAME -p --ssl < database\sepakat-cloud.sql )
+
+   PENTING: pakai sepakat-cloud.sql, BUKAN sepakat.sql. TiDB tidak mendukung
+   trigger/procedure/event; logikanya sudah dipindah ke api/koneksi.php.
+
+B. UPLOAD KODE KE GITHUB
+5. Buka https://github.com -> New repository -> nama: sepakat -> Private boleh -> Create.
+6. Klik "uploading an existing file" -> seret SEMUA isi folder sepakat
+   (api, css, js, database, index.html, vercel.json, .vercelignore, dst.) -> Commit changes.
+   Pastikan vercel.json ada di halaman utama repo (sejajar index.html).
+
+C. DEPLOY DI VERCEL
+7. Buka https://vercel.com -> Sign up / login pakai GitHub.
+8. Add New... -> Project -> pilih repo "sepakat" -> Import.
+9. Framework Preset: Other. Build Command & Output Directory: biarkan kosong.
+10. Buka "Environment Variables", isi 5 baris ini:
+       DB_HOST  = host dari TiDB (langkah 3)
+       DB_PORT  = 4000
+       DB_USER  = username dari TiDB (xxxxx.root)
+       DB_PASS  = password dari TiDB
+       DB_NAME  = sepakat
+11. Klik Deploy. Tunggu 1-2 menit -> dapat link, misal https://sepakat-xxx.vercel.app
+
+D. COBA
+12. Buka link-nya (di laptop atau HP, jaringan apa saja).
+    Login sama seperti biasa (password semua akun: sepakat123):
+       Dosen 0412038801 | Fakultas admin | Mahasiswa 2510631250013
+13. Karena sudah https, pop-up notifikasi di HP sekarang bisa aktif (izinkan saat diminta).
+
+E. KALAU ERROR
+- "Gagal konek ke database online"  -> salah isi Environment Variables.
+  Perbaiki di Vercel > Project > Settings > Environment Variables,
+  lalu tab Deployments > titik tiga > Redeploy (perubahan env baru berlaku setelah redeploy).
+- "Function Runtimes must have a valid version" -> vercel.json tidak ikut ter-upload / berubah.
+- Halaman tampil tapi data kosong -> F12 > Console / Network, lihat pesan dari api/data.php.
+- Setelah ubah kode: upload ulang file ke GitHub, Vercel otomatis deploy ulang.
+
+APA YANG BERUBAH DI KODE
+- api/koneksi.php : baca DB_* dari Vercel (kalau kosong = XAMPP seperti biasa),
+                    koneksi SSL, sesi login disimpan di tabel `sesi`,
+                    fungsi pengganti trigger/procedure untuk mode online.
+- api/data.php, keputusan.php, voting.php : pakai fungsi di atas.
+- vercel.json, .vercelignore, database/sepakat-cloud.sql : baru.
