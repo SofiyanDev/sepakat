@@ -11,7 +11,7 @@ $mk = [];
 foreach (semua($db, "SELECT j.*, r.nama_ruang, (SELECT COUNT(*) FROM mahasiswa m WHERE m.kelas = j.kelas) AS peserta
                      FROM jadwal_kuliah j JOIN ruang r ON r.id_ruang = j.id_ruang ORDER BY j.id_jadwal") as $j) {
     $mk[] = ["kode" => (int) $j["id_jadwal"], "nama" => $j["mata_kuliah"], "kelas" => $j["kelas"], "hari" => $j["hari"],
-             "jam" => rentang($j["jam"]), "ruang" => $j["nama_ruang"], "peserta" => (int) $j["peserta"],
+             "jam" => rentang_asli($j["jam"], $j["jam_selesai"]), "ruang" => $j["nama_ruang"], "peserta" => (int) $j["peserta"],
              "milikSaya" => ($user["peran"] === "dosen" && (int) $j["id_dosen"] === $user["id_dosen"])];
 }
 
@@ -26,7 +26,7 @@ foreach (semua($db, "SELECT j.hari, j.jam, j.mata_kuliah, j.kelas, r.nama_ruang 
 $where = ""; $types = ""; $val = [];
 if ($user["peran"] === "dosen")     { $where = "WHERE p.id_dosen = ?"; $types = "i"; $val = [$user["id_dosen"]]; }
 if ($user["peran"] === "mahasiswa") { $where = "WHERE j.kelas = ? AND p.status <> 'menunggu'"; $types = "s"; $val = [$user["kelas"]]; }
-$rows = semua($db, "SELECT p.*, j.mata_kuliah, j.kelas, j.hari, j.jam, ru.nama_ruang AS ruang_usulan,
+$rows = semua($db, "SELECT p.*, j.mata_kuliah, j.kelas, j.hari, j.jam, j.jam_selesai, ru.nama_ruang AS ruang_usulan,
                            r.jumlah_setuju, r.jumlah_tidak_setuju, r.jumlah_mahasiswa
                     FROM pengajuan_perubahan p
                     JOIN jadwal_kuliah j ON j.id_jadwal = p.id_jadwal
@@ -50,7 +50,7 @@ foreach ($rows as $p) {
     $tgl = substr($p["jadwal_usulan"], 0, 10);
     $pengajuan[] = [
         "id" => sprintf("PJ-%03d", $id), "idn" => $id, "kode" => (int) $p["id_jadwal"], "kelas" => $p["kelas"],
-        "lama" => $p["hari"] . " " . rentang($p["jam"]),
+        "lama" => $p["hari"] . " " . rentang_asli($p["jam"], $p["jam_selesai"]),
         "baru" => hari_dari_tanggal($tgl) . " " . rentang(substr($p["jadwal_usulan"], 11, 8)),
         "ruang" => $p["ruang_usulan"] ?? "-", "tgl" => $tgl, "alasan" => $p["alasan"], "status" => $p["status"],
         "setuju" => (int) $p["jumlah_setuju"], "tolak" => (int) $p["jumlah_tidak_setuju"], "pemilih" => (int) $p["jumlah_mahasiswa"],

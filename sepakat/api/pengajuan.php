@@ -5,7 +5,7 @@ $user = wajib_login("dosen");
 $in = input();
 $id_jadwal = (int) ($in["id_jadwal"] ?? 0);
 $tanggal   = $in["tanggal"] ?? "";
-$jam       = array_search($in["jam"] ?? "", SLOT);     // "13.00-15.30" -> "13:00:00"
+$jam       = array_search($in["jam"] ?? "", SLOT);     // "12.30-15.00" -> "12:30:00"
 $alasan    = trim($in["alasan"] ?? "");
 $ruang     = satu($db, "SELECT id_ruang FROM ruang WHERE nama_ruang = ?", "s", $in["ruang"] ?? "");
 

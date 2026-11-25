@@ -104,9 +104,11 @@ function jalankan($db, $sql, $types = "", ...$val) {
     return $st;
 }
 // slot jam kuliah: jam mulai -> rentang tampilan
-const SLOT = ["08:00:00" => "08.00-10.30", "10:30:00" => "10.30-13.00", "13:00:00" => "13.00-15.30", "15:30:00" => "15.30-18.00"];
+const SLOT = ["07:30:00" => "07.30-10.00", "10:00:00" => "10.00-12.30", "12:30:00" => "12.30-15.00", "15:00:00" => "15.00-17.30"];
 const HARI = [1 => "Senin", 2 => "Selasa", 3 => "Rabu", 4 => "Kamis", 5 => "Jumat", 6 => "Sabtu", 7 => "Minggu"];
 function rentang($jam) { return SLOT[$jam] ?? substr($jam, 0, 5); }
+// jam asli kuliah, misal "07.30-09.10" (kalau jam_selesai kosong pakai rentang slot)
+function rentang_asli($mulai, $selesai) { return $selesai ? str_replace(":", ".", substr($mulai, 0, 5) . "-" . substr($selesai, 0, 5)) : rentang($mulai); }
 function hari_dari_tanggal($tgl) { return HARI[(int) date("N", strtotime($tgl))]; }
 
 // ---------- status pengajuan ----------
