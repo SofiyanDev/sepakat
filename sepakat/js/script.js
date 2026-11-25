@@ -4,7 +4,7 @@
 // =====================================================================
 const USERS={dosen:{label:"Dosen"},mahasiswa:{label:"Mahasiswa"},admin:{label:"Fakultas/Admin"}};
 const PERAN={dosen:"dosen",mahasiswa:"mahasiswa",fakultas_admin:"admin"};
-const JAM=["08.00-10.30","10.30-13.00","13.00-15.30","15.30-18.00"];
+const JAM=["07.30-10.00","10.00-12.30","12.30-15.00","15.00-17.30"];
 let MK=[],RUANG=[],TERISI={};
 const terisi=(h,r,j)=>TERISI[h]?.[r]?.[j]||null;
 let TODAY=(()=>{const d=new Date();d.setHours(0,0,0,0);return d})();
@@ -215,7 +215,7 @@ const VIEWS={
      <label for="kj">Jenis keberatan<select id="kj"><option>Bentrok dengan jadwal kuliah lain</option><option>Bentrok dengan kegiatan akademik</option><option>Kendala transportasi/waktu</option><option>Lainnya</option></select></label>
      <label for="kn">Nama<input id="kn" value="${esc(USERS.mahasiswa.name)}" readonly></label>
      <label class="full" for="kalt">Opsi jadwal alternatif (opsional)<select id="kalt"><option value="">Tidak ada</option>${["Senin","Selasa","Rabu","Kamis","Jumat"].flatMap(h=>JAM.map(j=>`<option>${h} ${j}</option>`)).join("")}</select></label>
-     <label class="full" for="ki">Alasan keberatan<textarea id="ki" placeholder="contoh: Selasa 13.00 bentrok dengan Statistika kelas SI-3A."></textarea></label>
+     <label class="full" for="ki">Alasan keberatan<textarea id="ki" placeholder="contoh: Rabu 10.00 bentrok dengan Sistem Informasi Akuntansi dan Keuangan."></textarea></label>
      <p class="note full" id="kerr" hidden style="color:var(--bad)">Alasan keberatan wajib diisi.</p>
      <div class="row full"><button class="btn" type="submit">Kirim Keberatan</button></div>
    </form>`},
